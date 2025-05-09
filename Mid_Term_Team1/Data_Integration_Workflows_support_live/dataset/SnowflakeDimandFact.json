@@ -1,0 +1,25 @@
+{
+    "name": "SnowflakeDimandFact",
+    "properties": {
+        "linkedServiceName": {
+            "referenceName": "Midterm_project",
+            "type": "LinkedServiceReference"
+        },
+        "parameters": {
+            "TableName": {
+                "type": "string"
+            }
+        },
+        "annotations": [],
+        "type": "SnowflakeV2Table",
+        "schema": [],
+        "typeProperties": {
+            "schema": "STG",
+            "table": {
+                "value": "@dataset().TableName",
+                "type": "Expression"
+            }
+        }
+    },
+    "type": "Microsoft.DataFactory/factories/datasets"
+}

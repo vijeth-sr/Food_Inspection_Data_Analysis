@@ -1,0 +1,29 @@
+{
+    "name": "chicagofoodinspection",
+    "properties": {
+        "linkedServiceName": {
+            "referenceName": "foodinspection_data_storage",
+            "type": "LinkedServiceReference"
+        },
+        "annotations": [],
+        "type": "DelimitedText",
+        "typeProperties": {
+            "location": {
+                "type": "AzureBlobFSLocation",
+                "fileName": "Chicago_Food_Inspections_20241029.tsv",
+                "fileSystem": "chicago-food-inspection"
+            },
+            "columnDelimiter": "\t",
+            "escapeChar": "\\",
+            "firstRowAsHeader": true,
+            "quoteChar": "\""
+        },
+        "schema": [
+            {
+                "name": "Inspection ID\tDBA Name\tAKA Name\tLicense #\tFacility Type\tRisk\tAddress\tCity\tState\tZip\tInspection Date\tInspection Type\tResults\tViolations\tLatitude\tLongitude\tLocation",
+                "type": "String"
+            }
+        ]
+    },
+    "type": "Microsoft.DataFactory/factories/datasets"
+}

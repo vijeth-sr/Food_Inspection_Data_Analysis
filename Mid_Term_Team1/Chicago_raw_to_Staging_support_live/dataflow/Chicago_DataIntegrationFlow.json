@@ -1,0 +1,157 @@
+{
+    "name": "Chicago_DataIntegrationFlow",
+    "properties": {
+        "type": "MappingDataFlow",
+        "typeProperties": {
+            "sources": [
+                {
+                    "dataset": {
+                        "referenceName": "chicagofoodinspection",
+                        "type": "DatasetReference"
+                    },
+                    "name": "FoodInspection"
+                }
+            ],
+            "sinks": [
+                {
+                    "dataset": {
+                        "referenceName": "SnowflakeTable",
+                        "type": "DatasetReference"
+                    },
+                    "name": "SnowflakeTable"
+                }
+            ],
+            "transformations": [
+                {
+                    "name": "ViolationArray"
+                },
+                {
+                    "name": "flattenViolationArray"
+                },
+                {
+                    "name": "SplitViolation"
+                },
+                {
+                    "name": "datacleansing"
+                }
+            ],
+            "scriptLines": [
+                "source(output(",
+                "          {Inspection ID} as integer,",
+                "          {DBA Name} as string,",
+                "          {AKA Name} as string,",
+                "          {License #} as integer,",
+                "          {Facility Type} as string,",
+                "          Risk as string,",
+                "          Address as string,",
+                "          City as string,",
+                "          State as string,",
+                "          Zip as string,",
+                "          {Inspection Date} as date 'MM/dd/yyyy',",
+                "          {Inspection Type} as string,",
+                "          Results as string,",
+                "          Violations as string,",
+                "          Latitude as string,",
+                "          Longitude as string,",
+                "          Location as string",
+                "     ),",
+                "     allowSchemaDrift: true,",
+                "     validateSchema: false,",
+                "     ignoreNoFilesFound: false) ~> FoodInspection",
+                "datacleansing derive(Violations = split(Violations, ' | ')) ~> ViolationArray",
+                "ViolationArray foldDown(unroll(Violations),",
+                "     mapColumn(",
+                "          {Inspection ID},",
+                "          {DBA Name},",
+                "          {AKA Name},",
+                "          {License #},",
+                "          {Facility Type},",
+                "          Risk,",
+                "          Address,",
+                "          City,",
+                "          State,",
+                "          Zip,",
+                "          {Inspection Date},",
+                "          {Inspection Type},",
+                "          Results,",
+                "          Violations,",
+                "          Latitude,",
+                "          Longitude,",
+                "          Location",
+                "     ),",
+                "     skipDuplicateMapInputs: false,",
+                "     skipDuplicateMapOutputs: false) ~> flattenViolationArray",
+                "flattenViolationArray derive(Violation_ID = regexExtract(Violations, '^\\\\d+', 0),",
+                "          Violation_Description = regexExtract(Violations, '\\\\d+\\\\.\\\\s(.*)\\\\s- Comments:', 1),",
+                "          Comments = regexExtract(Violations, '- Comments:\\\\s(.*)', 1),",
+                "          DI_CreateDate = currentDate(),",
+                "          DI_WorkflowFileName = \"Chicago_Food_Inspection_IntegrationFlow\") ~> SplitViolation",
+                "FoodInspection derive({DBA Name} = trim({DBA Name}),",
+                "          {AKA Name} = trim({AKA Name}),",
+                "          Address = trim(Address),",
+                "          City = trim(upper(City)),",
+                "          State = trim(upper(State)),",
+                "          Results = trim(Results),",
+                "          {Facility Type} = trim({Facility Type}),",
+                "          {Inspection Type} = trim(upper({Inspection Type}))) ~> datacleansing",
+                "SplitViolation sink(allowSchemaDrift: true,",
+                "     validateSchema: false,",
+                "     input(",
+                "          RECORD_ID as string,",
+                "          INSPECTION_ID as string,",
+                "          DBA_NAME as string,",
+                "          AKA_NAME as string,",
+                "          LICENSE_NUMBER as string,",
+                "          FACILITY_TYPE as string,",
+                "          RISK as string,",
+                "          ADDRESS as string,",
+                "          CITY as string,",
+                "          STATE as string,",
+                "          ZIP_CODE as string,",
+                "          INSPECTION_DATE as string,",
+                "          INSPECTION_TYPE as string,",
+                "          RESULTS as string,",
+                "          LATITUDE as string,",
+                "          LONGITUDE as string,",
+                "          LOCATION as string,",
+                "          VIOLATION_ID as string,",
+                "          VIOLATION_DESCRIPTION as string,",
+                "          COMMENTS as string,",
+                "          DI_CREATEDATE as string,",
+                "          DI_WORKFLOWFILENAME as string",
+                "     ),",
+                "     deletable:false,",
+                "     insertable:true,",
+                "     updateable:false,",
+                "     upsertable:false,",
+                "     format: 'table',",
+                "     skipDuplicateMapInputs: true,",
+                "     skipDuplicateMapOutputs: true,",
+                "     stageInsert: true,",
+                "     mapColumn(",
+                "          INSPECTION_ID = {Inspection ID},",
+                "          DBA_NAME = {DBA Name},",
+                "          AKA_NAME = {AKA Name},",
+                "          LICENSE_NUMBER = {License #},",
+                "          FACILITY_TYPE = {Facility Type},",
+                "          RISK = Risk,",
+                "          ADDRESS = Address,",
+                "          CITY = City,",
+                "          STATE = State,",
+                "          ZIP_CODE = Zip,",
+                "          INSPECTION_DATE = {Inspection Date},",
+                "          INSPECTION_TYPE = {Inspection Type},",
+                "          RESULTS = Results,",
+                "          LATITUDE = Latitude,",
+                "          LONGITUDE = Longitude,",
+                "          LOCATION = Location,",
+                "          VIOLATION_ID = Violation_ID,",
+                "          VIOLATION_DESCRIPTION = Violation_Description,",
+                "          COMMENTS = Comments,",
+                "          DI_CREATEDATE = DI_CreateDate,",
+                "          DI_WORKFLOWFILENAME = DI_WorkflowFileName",
+                "     )) ~> SnowflakeTable"
+            ]
+        }
+    }
+}

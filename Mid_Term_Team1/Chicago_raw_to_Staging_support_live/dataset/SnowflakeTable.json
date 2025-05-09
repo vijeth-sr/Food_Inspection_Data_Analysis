@@ -1,0 +1,114 @@
+{
+    "name": "SnowflakeTable",
+    "properties": {
+        "linkedServiceName": {
+            "referenceName": "Midterm_project",
+            "type": "LinkedServiceReference"
+        },
+        "annotations": [],
+        "type": "SnowflakeV2Table",
+        "schema": [
+            {
+                "name": "RECORD_ID",
+                "type": "NUMBER",
+                "precision": 38,
+                "scale": 0
+            },
+            {
+                "name": "INSPECTION_ID",
+                "type": "NUMBER",
+                "precision": 38,
+                "scale": 0
+            },
+            {
+                "name": "DBA_NAME",
+                "type": "VARCHAR"
+            },
+            {
+                "name": "AKA_NAME",
+                "type": "VARCHAR"
+            },
+            {
+                "name": "LICENSE_NUMBER",
+                "type": "NUMBER",
+                "precision": 38,
+                "scale": 0
+            },
+            {
+                "name": "FACILITY_TYPE",
+                "type": "VARCHAR"
+            },
+            {
+                "name": "RISK",
+                "type": "VARCHAR"
+            },
+            {
+                "name": "ADDRESS",
+                "type": "VARCHAR"
+            },
+            {
+                "name": "CITY",
+                "type": "VARCHAR"
+            },
+            {
+                "name": "STATE",
+                "type": "VARCHAR"
+            },
+            {
+                "name": "ZIP_CODE",
+                "type": "VARCHAR"
+            },
+            {
+                "name": "INSPECTION_DATE",
+                "type": "DATE"
+            },
+            {
+                "name": "INSPECTION_TYPE",
+                "type": "VARCHAR"
+            },
+            {
+                "name": "RESULTS",
+                "type": "VARCHAR"
+            },
+            {
+                "name": "LATITUDE",
+                "type": "VARCHAR"
+            },
+            {
+                "name": "LONGITUDE",
+                "type": "VARCHAR"
+            },
+            {
+                "name": "LOCATION",
+                "type": "VARCHAR"
+            },
+            {
+                "name": "VIOLATION_ID",
+                "type": "NUMBER",
+                "precision": 38,
+                "scale": 0
+            },
+            {
+                "name": "VIOLATION_DESCRIPTION",
+                "type": "VARCHAR"
+            },
+            {
+                "name": "COMMENTS",
+                "type": "VARCHAR"
+            },
+            {
+                "name": "DI_CREATEDATE",
+                "type": "DATE"
+            },
+            {
+                "name": "DI_WORKFLOWFILENAME",
+                "type": "VARCHAR"
+            }
+        ],
+        "typeProperties": {
+            "schema": "CHICAGOSTAGE",
+            "table": "CHICAGO_FOOD_INSPECTIONS"
+        }
+    },
+    "type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,155 @@
+{
+    "name": "Data_Integration_Workflows",
+    "properties": {
+        "activities": [
+            {
+                "name": "Dim Fact Data Load",
+                "type": "ExecuteDataFlow",
+                "state": "Inactive",
+                "onInactiveMarkAs": "Succeeded",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "dataflow": {
+                        "referenceName": "Dim_Load_Chicago",
+                        "type": "DataFlowReference",
+                        "datasetParameters": {
+                            "DimResults": {
+                                "TableName": "DIM_INSPECTIONRESULTS"
+                            },
+                            "DimInspectionType": {
+                                "TableName": "DIM_INSPECTIONTYPE"
+                            },
+                            "DimRisk": {
+                                "TableName": "DIM_RISKCATEGORY"
+                            },
+                            "DimRestaurant": {
+                                "TableName": "DIM_RESTAURANTS"
+                            },
+                            "DimViolations": {
+                                "TableName": "DIM_VIOLATIONCODES"
+                            }
+                        }
+                    },
+                    "compute": {
+                        "coreCount": 8,
+                        "computeType": "General"
+                    },
+                    "traceLevel": "Fine"
+                }
+            },
+            {
+                "name": "FCTLoad",
+                "type": "ExecuteDataFlow",
+                "state": "Inactive",
+                "onInactiveMarkAs": "Succeeded",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "dataflow": {
+                        "referenceName": "Fct_Load",
+                        "type": "DataFlowReference",
+                        "datasetParameters": {
+                            "DimResults": {
+                                "TableName": "DIM_INSPECTIONRESULTS"
+                            },
+                            "DimInspections": {
+                                "TableName": "DIM_INSPECTIONTYPE"
+                            },
+                            "DimRisk": {
+                                "TableName": "DIM_RISKCATEGORY"
+                            },
+                            "DimRestaurant": {
+                                "TableName": "DIM_RESTAURANTS"
+                            },
+                            "DimDate": {
+                                "TableName": "DIM_DATE"
+                            },
+                            "LoadToFactTable": {
+                                "TableName": "FCT_FoodInspections"
+                            }
+                        }
+                    },
+                    "compute": {
+                        "coreCount": 8,
+                        "computeType": "General"
+                    },
+                    "traceLevel": "Fine"
+                }
+            },
+            {
+                "name": "ScriptFact1",
+                "type": "Script",
+                "state": "Inactive",
+                "onInactiveMarkAs": "Succeeded",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "linkedServiceName": {
+                    "referenceName": "Midterm_project",
+                    "type": "LinkedServiceReference"
+                },
+                "typeProperties": {
+                    "scripts": [
+                        {
+                            "type": "Query",
+                            "text": "INSERT INTO MIDTERM_TEAM1.STG.FCT_FOODINSPECTIONS (\n    InspectionID,\n    InspectionDate,\n    DateSK,\n    RestaurantSK,\n    InspectionTypeSK,\n    ResultsSK,\n    RiskSK,\n    Inspection_Score,\n    DI_CreateDate,\n    DI_WorkflowFileName\n)\nSELECT\n    S.INSPECTION_ID,\n    S.INSPECTION_DATE AS InspectionDate,                       -- Inspection date from the staging table\n    D.DATESK AS DateSK,                                        -- Foreign key from DimDate\n    R.RESTAURANTSK AS RestaurantSK,                            -- Foreign key from DimRestaurant\n    IT.INSPECTIONTYPESK AS InspectionTypeSK,                   -- Foreign key from DimInspections\n    IR.RESULTSSK AS ResultsSK,                                 -- Foreign key from DimResults\n    RC.RISKSK AS RiskSK,                                       -- Foreign key from DimRisk\nNULL AS Inspection_Score,                                  -- Placeholder if needed\n    CURRENT_TIMESTAMP AS DI_CreateDate,                        -- Automatically set creation date\n    'Chicago_FoodInspection_Workflow' AS DI_WorkflowFileName   -- Workflow file name\nFROM\n    MIDTERM_TEAM1.CHICAGOSTAGE.CHICAGO_FOOD_INSPECTIONS S\nLEFT JOIN\n    MIDTERM_TEAM1.STG.DIM_DATE D ON D.FULL_DATE = S.INSPECTION_DATE               -- Join with date dimension on inspection date\nLEFT JOIN\n    MIDTERM_TEAM1.STG.DIM_RESTAURANTS R ON \n        R.RESTAURANT_NAME = S.DBA_NAME AND\n        R.ADDRESS = S.ADDRESS AND\n        R.LATITUDE = S.LATITUDE AND\n        R.LONGITUDE = S.LONGITUDE AND\n        R.FACILITY_TYPE = S.FACILITY_TYPE AND\n        R.CITY = S.CITY AND\n        R.STATE = S.STATE                                      -- Join with restaurant dimension on multiple fields\nLEFT JOIN\n    MIDTERM_TEAM1.STG.DIM_INSPECTIONTYPE IT ON IT.INSPECTIONTYPE = S.INSPECTION_TYPE -- Join with inspection type dimension\nLEFT JOIN\n    MIDTERM_TEAM1.STG.DIM_INSPECTIONRESULTS IR ON IR.RESULTS = S.RESULTS                    -- Join with results dimension\nLEFT JOIN\n    MIDTERM_TEAM1.STG.DIM_RISKCATEGORY RC ON RC.RISK = S.RISK                             -- Join with risk dimension\nWHERE\n    S.INSPECTION_DATE IS NOT NULL;  "
+                        }
+                    ],
+                    "scriptBlockExecutionTimeout": "02:00:00"
+                }
+            },
+            {
+                "name": "ScriptFactViolation",
+                "type": "Script",
+                "state": "Inactive",
+                "onInactiveMarkAs": "Succeeded",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "linkedServiceName": {
+                    "referenceName": "Midterm_project",
+                    "type": "LinkedServiceReference"
+                },
+                "typeProperties": {
+                    "scripts": [
+                        {
+                            "type": "Query",
+                            "text": "INSERT INTO  MIDTERM_TEAM1.STG.FCT_INSPECTIONS_VIOLATIONS(\n    InspectionID,\n    ViolationSK,\n    ViolationDetail,\n    ViolationMemo,\n    ViolationPoints,\n    DI_CreateDate,\n    DI_WorkflowFileName\n)\nSELECT Distinct\n    FI.INSPECTIONID,                                 -- Connect to FCT_FoodInspections using InspectionID\n    VC.ViolationSK,                                  -- Foreign key from Dim_ViolationCodes\n    S.COMMENTS AS ViolationDetail,                   -- Violation description from the staging table\n    NULL AS ViolationMemo,                           -- Additional comments or memo from the staging table\n    -1 AS ViolationPoints,                           -- Violation points, cast as INT if necessary\n    CURRENT_TIMESTAMP AS DI_CreateDate,              -- Automatically set creation date\n    'Chicago_FoodInspection_Workflow' AS DI_WorkflowFileName  -- Workflow file name\nFROM\n    MIDTERM_TEAM1.CHICAGOSTAGE.CHICAGO_FOOD_INSPECTIONS S\nJOIN\n    MIDTERM_TEAM1.STG.FCT_FOODINSPECTIONS FI \n    ON FI.InspectionID = S.INSPECTION_ID             -- Join with the main fact table\nJOIN\n    MIDTERM_TEAM1.STG.DIM_VIOLATIONCODES VC \n    ON VC.ViolationCode = S.VIOLATION_ID             -- Join with Dim_ViolationCodes on ViolationCode\n    AND VC.ViolationDescription = S.VIOLATION_DESCRIPTION  -- Additional join on ViolationDescription to ensure unique ViolationSK\nWHERE\n    S.VIOLATION_ID IS NOT NULL "
+                        }
+                    ],
+                    "scriptBlockExecutionTimeout": "02:00:00"
+                }
+            }
+        ],
+        "annotations": [],
+        "lastPublishTime": "2024-11-04T01:17:12Z"
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}

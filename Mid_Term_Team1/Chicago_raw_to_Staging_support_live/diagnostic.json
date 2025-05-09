@@ -1,0 +1,24 @@
+{
+    "now": "2024-11-04T04:10:14.540Z",
+    "perfNow": 7040207.399999991,
+    "diagnosticCorrelation": "8ee93091-e328-4230-bda3-206cb5f0e26a",
+    "source": "DownloadSupportFiles",
+    "environment": {
+        "productName": "adf",
+        "buildVersion": "1.0.101424.2",
+        "environmentType": 3,
+        "resourceName": "food-inspection-etl",
+        "resourceRegion": "eastus",
+        "resourceGroup": "food-inspection",
+        "subscriptionId": "fd7eeae1-e0fb-4000-a2cc-a0f724f0b26c",
+        "sessionId": "yC9iXnQtDPQkSbnY79Nicg",
+        "operationId": "",
+        "gitType": "live",
+        "loggingKey": "6d7e890d-5888-4297-a0c6-208c0c293298"
+    },
+    "additionalInfo": {
+        "selectedResource": "Chicago_raw_to_Staging",
+        "selectedResourceType": "pipeline",
+        "dataFlowSessionId": "a84ba06e-8e6e-4dbb-b97f-40ac62b7f150"
+    }
+}

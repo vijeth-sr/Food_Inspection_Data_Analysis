@@ -1,0 +1,7 @@
+selected resource name:		Chicago_raw_to_Staging
+selected resource type:		pipeline
+factory name:			food-inspection-etl
+factory location:		eastus
+subscription id:		fd7eeae1-e0fb-4000-a2cc-a0f724f0b26c
+data flow session id:		a84ba06e-8e6e-4dbb-b97f-40ac62b7f150
+time of download (UTC):		Mon, 04 Nov 2024 04:10:14 GMT
