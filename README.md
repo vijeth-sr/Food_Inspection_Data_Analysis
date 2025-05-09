@@ -42,7 +42,4 @@ To merge the two datasets, the following steps were taken:
 - **Power BI**: For visualizing and analyzing the inspection data.
 - **Python**: For any additional data processing and automation.
 
-## How to Run the Project
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/food-inspection-analysis.git
+
